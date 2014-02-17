@@ -79,6 +79,7 @@ public class RobotTemplate extends IterativeRobot {
         
         atShoot = false;
         goShoot = false;
+        afterShoot = false;
         
         relay.set(Relay.Value.kOn);
         
@@ -144,6 +145,7 @@ public class RobotTemplate extends IterativeRobot {
                 jagRight1.set(0);
                 jagRight2.set(0);
             } else {
+                relay.set(Relay.Value.kOff);
                 sol7.set(true);
                 sol8.set(false);
                 if (encoder.getAverageVoltage() < 3.75) {
