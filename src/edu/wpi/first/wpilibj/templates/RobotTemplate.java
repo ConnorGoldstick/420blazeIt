@@ -4,9 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-
 package edu.wpi.first.wpilibj.templates;
-
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 
@@ -22,17 +20,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class RobotTemplate extends IterativeRobot {
-    
+
     Jaguar jagLeft1, jagLeft2, jagRight1, jagRight2;
     Victor victor;
     Solenoid sol1, sol2, sol4, sol5, sol7, sol8;
     Relay relay;
     AnalogChannel ultrasonic, encoder;
     double conf;
-    boolean atShoot, goShoot, afterShoot;
+    boolean atShoot, afterShoot;
     int endTimer, noWait;
     NetworkTable server = NetworkTable.getTable("smartDashboard");
-    
+
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -61,36 +59,36 @@ public class RobotTemplate extends IterativeRobot {
 
         conf = 0;
         noWait = 0;
-        endTimer =0;
-        
+        endTimer = 0;
+
         afterShoot = false;
         atShoot = false;
-        goShoot = false;
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousInit() {
-        
+
         conf = 0;
         noWait = 0;
         endTimer = 0;
-        
+
         atShoot = false;
-        goShoot = false;
         afterShoot = false;
-        
+
         relay.set(Relay.Value.kOn);
-        
+
         sol1.set(true);
         sol2.set(false);
-        sol4.set(true);
-        sol5.set(false);
+        /*sol4.set(true);
+        sol5.set(false);*/
         sol7.set(true);
         sol8.set(false);
     }
+
     public void autonomousPeriodic() {
+        System.out.println("Confidence: " + conf);
         if (!atShoot) {
             if (ultrasonic.getVoltage() > 1.14) {
                 conf = conf + server.getNumber("Confidence");
@@ -98,6 +96,7 @@ public class RobotTemplate extends IterativeRobot {
                 jagLeft2.set(1);
                 jagRight1.set(-1);
                 jagRight2.set(-1);
+                System.out.println("Driving forward.");
                 //420 blaze it
             } else {
                 jagLeft1.set(0);
@@ -105,16 +104,22 @@ public class RobotTemplate extends IterativeRobot {
                 jagRight1.set(0);
                 jagRight2.set(0);
                 atShoot = true;
+                System.out.println("Done 420 blazin'.");
             }
         }
-        if (atShoot) {
+        if (atShoot && !afterShoot) {
             if (conf >= 40) {
-                sol4.set(false);
-                sol5.set(true);
+                System.out.println("Saw Target.");
+                /*sol4.set(false);
+                sol5.set(true);*/
                 sol7.set(false);
                 sol8.set(true);
                 afterShoot = true;
+                System.out.println("Launching.");
             } else {
+                if (noWait == 0) {
+                    System.out.println("Did not see target.");
+                }
                 noWait++;
                 if (ultrasonic.getVoltage() > 0.88) {
                     jagLeft1.set(0.2);
@@ -129,11 +134,12 @@ public class RobotTemplate extends IterativeRobot {
                     jagRight2.set(0.2);
                 }
                 if (noWait == 200) {
-                    sol4.set(false);
-                    sol5.set(true);
+                    /*sol4.set(false);
+                    sol5.set(true);*/
                     sol7.set(false);
                     sol8.set(true);
                     afterShoot = true;
+                    System.out.println("Launching.");
                 }
             }
         }
@@ -144,15 +150,14 @@ public class RobotTemplate extends IterativeRobot {
                 jagLeft2.set(0);
                 jagRight1.set(0);
                 jagRight2.set(0);
+                if (endTimer == 99) {
+                    System.out.println("Retracting Launcher.");
+                }
             } else {
                 relay.set(Relay.Value.kOff);
                 sol7.set(true);
                 sol8.set(false);
-                if (encoder.getAverageVoltage() < 3.75) {
-                    victor.set(-0.3);
-                } else {
-                    victor.set(0);
-                }
+                System.out.println("Autonomous Complete.");
             }
         }
     }
@@ -161,14 +166,11 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        
     }
-    
+
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-    
     }
-    
 }
