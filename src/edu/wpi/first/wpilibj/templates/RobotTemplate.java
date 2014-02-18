@@ -29,7 +29,7 @@ public class RobotTemplate extends IterativeRobot {
     double conf;
     boolean atShoot, afterShoot;
     int endTimer, noWait;
-    NetworkTable server = NetworkTable.getTable("smartDashboard");
+    NetworkTable server = NetworkTable.getTable("SmartDashboard");
 
     /**
      * This function is run when the robot is first started up and should be
@@ -90,12 +90,12 @@ public class RobotTemplate extends IterativeRobot {
     public void autonomousPeriodic() {
         System.out.println("Confidence: " + conf);
         if (!atShoot) {
-            if (ultrasonic.getVoltage() > 1.14) {
-                conf = conf + server.getNumber("Confidence");
-                jagLeft1.set(1);
-                jagLeft2.set(1);
-                jagRight1.set(-1);
-                jagRight2.set(-1);
+            if (ultrasonic.getVoltage() > 0.86) {
+                conf = conf + SmartDashboard.getNumber("Confidence") - 70;
+                jagLeft1.set(-0.648);
+                jagLeft2.set(-0.648);
+                jagRight1.set(0.6);
+                jagRight2.set(0.6);
                 System.out.println("Driving forward.");
                 //420 blaze it
             } else {
@@ -110,8 +110,6 @@ public class RobotTemplate extends IterativeRobot {
         if (atShoot && !afterShoot) {
             if (conf >= 40) {
                 System.out.println("Saw Target.");
-                /*sol4.set(false);
-                sol5.set(true);*/
                 sol7.set(false);
                 sol8.set(true);
                 afterShoot = true;
@@ -121,21 +119,19 @@ public class RobotTemplate extends IterativeRobot {
                     System.out.println("Did not see target.");
                 }
                 noWait++;
-                if (ultrasonic.getVoltage() > 0.88) {
-                    jagLeft1.set(0.2);
-                    jagLeft2.set(0.2);
-                    jagRight1.set(-0.2);
-                    jagRight2.set(-0.2);
-                }
-                if (ultrasonic.getVoltage() < 0.86) {
-                    jagLeft1.set(-0.2);
-                    jagLeft2.set(-0.2);
+                if (ultrasonic.getVoltage() > 0.85) {
+                    jagLeft1.set(-0.216);
+                    jagLeft2.set(-0.216);
                     jagRight1.set(0.2);
                     jagRight2.set(0.2);
                 }
+                if (ultrasonic.getVoltage() < 0.81) {
+                    jagLeft1.set(0.216);
+                    jagLeft2.set(0.216);
+                    jagRight1.set(-0.2);
+                    jagRight2.set(-0.2);
+                }
                 if (noWait == 200) {
-                    /*sol4.set(false);
-                    sol5.set(true);*/
                     sol7.set(false);
                     sol8.set(true);
                     afterShoot = true;
